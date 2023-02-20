@@ -1,0 +1,14 @@
+<% content_for :title do %>
+  トップページ
+<% end %>
+
+  <button onclick="location.href='/new'" class="add">+Add Memo</button>
+  <ul class="container">
+    <% @memos.each_with_index do |memo, index| %>
+    <li>
+      <a href="/memos/<%= index.to_s %>">
+        <%= memo["title"] %>
+      </a>
+    </li>
+    <% end %>
+  </ul>

@@ -1,0 +1,10 @@
+<% content_for :title do %>
+  編集ページ
+<% end %>
+
+  <form method="post" action="/memos/<%= @id %>">
+    <input type="text" name="title" value="<%= @memo["title"] %>" class="textbox"><br>
+    <textarea name="content" class="textbox"><%= @memo["content"] %></textarea><br>
+    <input type="hidden" name="_method" value="PATCH">
+    <input type="submit" value="変更" class="btn">
+  </form>
