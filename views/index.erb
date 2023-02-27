@@ -7,7 +7,7 @@
     <% @memos.each_with_index do |memo, index| %>
     <li>
       <a href="/memos/<%= index.to_s %>">
-        <%= memo["title"] %>
+        <%= Rack::Utils.escape_html(memo["title"]) %>
       </a>
     </li>
     <% end %>
