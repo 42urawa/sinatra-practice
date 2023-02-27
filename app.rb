@@ -7,12 +7,12 @@ require 'rack/utils'
 require 'json'
 
 def read_memos_file
-  json_memos_data = File.read('db/data.json')
-  JSON.parse(json_memos_data)
+  JSON.parse(File.read('db/data.json'))
 end
 
-def write_memos_file(memos)
-  memos['memos'] << params
+# 第二引数new_memoはhash型
+def write_memos_file(memos, new_memo)
+  memos['memos'] << new_memo if !!new_memo
   File.write('db/data.json', JSON.generate(memos))
 end
 
@@ -26,41 +26,36 @@ get '/new' do
 end
 
 post '/new' do
-  hash_memos = read_memos_file
-  write_memos_file(hash_memos)
+  write_memos_file(read_memos_file, params)
   redirect '/'
   erb :index
 end
 
 get '/memos/:id' do
-  memos = read_memos_file['memos']
-  @memo = memos[params[:id].to_i]
   @id = params[:id]
+  @memo = read_memos_file['memos'][@id.to_i]
   erb :show
 end
 
 get '/memos/:id/edit' do
-  memos = read_memos_file['memos']
-  @memo = memos[params[:id].to_i]
   @id = params[:id]
+  @memo = read_memos_file['memos'][@id.to_i]
   erb :edit
 end
 
 patch '/memos/:id' do
-  hash_memos = read_memos_file
-
-  hash_memos['memos'][params[:id].to_i]['title'] = params[:title]
-  hash_memos['memos'][params[:id].to_i]['content'] = params[:content]
-  File.write('db/data.json', JSON.generate(hash_memos))
-
+  memos = read_memos_file
+  memos['memos'][params[:id].to_i]['title'] = params[:title]
+  memos['memos'][params[:id].to_i]['content'] = params[:content]
+  write_memos_file(memos, nil)
   redirect "/memos/#{params[:id]}"
   erb :show
 end
 
 delete '/memos/:id' do
-  hash_memos = read_memos_file
-  hash_memos['memos'].delete_at(params[:id].to_i)
-  File.write('db/data.json', JSON.generate(hash_memos))
+  memos = read_memos_file
+  memos['memos'].delete_at(params[:id].to_i)
+  write_memos_file(memos, nil)
   redirect '/'
   erb :index
 end
