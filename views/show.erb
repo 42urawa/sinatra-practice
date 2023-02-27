@@ -4,7 +4,7 @@
 
   <h2><%= @memo["title"] %></h2>
   <h3><%= @memo["content"].gsub(/\r\n|\n|\r/, "<br>") %></h3>
-  <button onclick="location.href='/edit/<%= @id %>'" class="btn">変更</button>
+  <button onclick="location.href='/memos/<%= @id %>/edit'" class="btn">変更</button>
   <form method="post" action="/memos/<%= @id %>">
     <input type="hidden" name="_method" value="DELETE">
     <input type="submit" value="削除" class="btn">
