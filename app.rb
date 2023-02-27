@@ -12,7 +12,7 @@ end
 
 # 第二引数new_memoはhash型
 def write_memos_file(memos, new_memo)
-  memos['memos'] << new_memo if !!new_memo
+  memos['memos'] << new_memo unless new_memo.nil?
   File.write('db/data.json', JSON.generate(memos))
 end
 
