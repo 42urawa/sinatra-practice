@@ -10,9 +10,7 @@ def read_memos_file
   JSON.parse(File.read('db/data.json'))
 end
 
-# 第二引数new_memoはhash型
-def write_memos_file(memos, new_memo)
-  memos['memos'] << new_memo unless new_memo.nil?
+def write_memos_file(memos)
   File.write('db/data.json', JSON.generate(memos))
 end
 
@@ -26,7 +24,9 @@ get '/new' do
 end
 
 post '/new' do
-  write_memos_file(read_memos_file, params)
+  memos = read_memos_file
+  memos['memos'] << params
+  write_memos_file(memos)
   redirect '/'
   erb :index
 end
@@ -47,7 +47,7 @@ patch '/memos/:id' do
   memos = read_memos_file
   memos['memos'][params[:id].to_i]['title'] = params[:title]
   memos['memos'][params[:id].to_i]['content'] = params[:content]
-  write_memos_file(memos, nil)
+  write_memos_file(memos)
   redirect "/memos/#{params[:id]}"
   erb :show
 end
@@ -55,7 +55,7 @@ end
 delete '/memos/:id' do
   memos = read_memos_file
   memos['memos'].delete_at(params[:id].to_i)
-  write_memos_file(memos, nil)
+  write_memos_file(memos)
   redirect '/'
   erb :index
 end
