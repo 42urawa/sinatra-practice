@@ -1,0 +1,11 @@
+<% content_for :title do %>
+  メモ表示ページ
+<% end %>
+
+  <h2><%= Rack::Utils.escape_html(@memo["title"]) %></h2>
+  <h3><%= Rack::Utils.escape_html(@memo["content"]).gsub(/\r\n|\n|\r/, "<br>") %></h3>
+  <button onclick="location.href='/memos/<%= @id %>/edit'" class="btn">変更</button>
+  <form method="post" action="/memos/<%= @id %>">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="submit" value="削除" class="btn">
+  </form>

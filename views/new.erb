@@ -1,0 +1,9 @@
+<% content_for :title do %>
+  メモ作成ページ
+<% end %>
+
+  <form method="post" action="/new">
+    <input type="text" name="title" class="textbox" placeholder="タイトルを入力してください"><br>
+    <textarea name="content" class="textbox" placeholder="テキストを入力してください"></textarea><br>
+    <input type="submit" value="保存" class="btn">
+  </form>
