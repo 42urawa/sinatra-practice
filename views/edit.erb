@@ -2,7 +2,7 @@
   編集ページ
 <% end %>
 
-  <form method="post" action="/memos/<%= @id %>">
+  <form method="post" action="/memos/<%= @memo["id"] %>">
     <input type="text" name="title" value="<%= Rack::Utils.escape_html(@memo["title"]) %>" class="textbox"><br>
     <textarea name="content" class="textbox"><%= Rack::Utils.escape_html(@memo["content"]) %></textarea><br>
     <input type="hidden" name="_method" value="PATCH">
