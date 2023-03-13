@@ -4,18 +4,23 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sinatra/content_for'
 require 'rack/utils'
-require 'json'
+require 'pg'
 
-def read_memos_file
-  JSON.parse(File.read('db/data.json'))
-end
-
-def write_memos_file(memos)
-  File.write('db/data.json', JSON.generate(memos))
+configure do
+  conn = PG.connect(
+    host: 'localhost',
+    port: 5432,
+    dbname: 'postgres',
+    user: 'postgres',
+    password: 'postgres'
+  )
+  set :conn, conn
 end
 
 get '/' do
-  @memos = read_memos_file['memos']
+  conn = settings.conn
+  result = conn.exec('SELECT * FROM memos')
+  @memos = result.to_a
   erb :index
 end
 
@@ -24,40 +29,39 @@ get '/new' do
 end
 
 post '/new' do
-  memos = read_memos_file
-  memos['memos'] << params
-  write_memos_file(memos)
+  conn = settings.conn
+  conn.exec_params('INSERT INTO memos (title, content) VALUES ($1, $2)', [params[:title], params[:content]])
   redirect '/'
-  erb :index
 end
 
 get '/memos/:id' do
-  @id = params[:id]
-  @memo = read_memos_file['memos'][@id.to_i]
+  conn = settings.conn
+  result = conn.exec_params('SELECT * FROM memos WHERE id = $1', [params[:id].to_i])
+  @memo = result.to_a[0]
   erb :show
 end
 
 get '/memos/:id/edit' do
-  @id = params[:id]
-  @memo = read_memos_file['memos'][@id.to_i]
+  conn = settings.conn
+  result = conn.exec_params('SELECT * FROM memos WHERE id = $1', [params[:id].to_i])
+  @memo = result.to_a[0]
   erb :edit
 end
 
 patch '/memos/:id' do
-  memos = read_memos_file
-  memos['memos'][params[:id].to_i]['title'] = params[:title]
-  memos['memos'][params[:id].to_i]['content'] = params[:content]
-  write_memos_file(memos)
+  conn = settings.conn
+  result = conn.exec_params(
+    'UPDATE memos SET title = $1, content = $2 WHERE id = $3',
+    [params[:title], params[:content], params[:id].to_i]
+  )
+  @memo = result.to_a[0]
   redirect "/memos/#{params[:id]}"
-  erb :show
 end
 
 delete '/memos/:id' do
-  memos = read_memos_file
-  memos['memos'].delete_at(params[:id].to_i)
-  write_memos_file(memos)
+  conn = settings.conn
+  conn.exec_params('DELETE FROM memos WHERE id = $1', [params[:id].to_i])
   redirect '/'
-  erb :index
 end
 
 not_found do
